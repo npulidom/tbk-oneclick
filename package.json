@@ -1,0 +1,19 @@
+{
+	"name": "g-tbk-oneclick",
+	"license": "UNLICENSED",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"up": "docker-compose up -d",
+		"down": "docker-compose down",
+		"watch": "docker logs -ft g-tbk-oneclick"
+	},
+	"dependencies": {
+		"@fastify/bearer-auth": "~9.0.0",
+		"fastify": "~4.22.2",
+		"mongodb": "~5.9.0",
+		"pino-pretty": "~10.2.0",
+		"transbank-sdk": "~4.0.0",
+		"xss": "~1.0.14"
+	}
+}
