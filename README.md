@@ -1,6 +1,6 @@
 # Transbank OneClick
 
-Container service for Transbank OneClick using MongoDB as database storage.
+Container service for Transbank OneClick API using MongoDB as database storage.
 
 - MongoDB v4+ required
 - For security reasons, prevent exposing this API directly at client-side applications.
