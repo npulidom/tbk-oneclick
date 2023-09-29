@@ -72,7 +72,7 @@ Body Params
 - amount `number`
 
 ```bash
-curl -iX POST -H 'Content-Type: application/json' -H 'Authorization: Bearer {API-KEY}' -d '{ "userId": "6517213dd708e471d4f1cc46", "commerceCode": "{commerceCode}", "buyOrder": "{buyOrder}", "amount": {amount} }' {BASE_URL}/inscription/refund
+curl -iX POST -H 'Content-Type: application/json' -H 'Authorization: Bearer {API-KEY}' -d '{ "userId": "6517213dd708e471d4f1cc46", "commerceCode": "597055555542", "buyOrder": "12345678", "amount": 800 }' {BASE_URL}/inscription/refund
 ```
 
 ### Response Format
