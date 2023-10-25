@@ -25,6 +25,14 @@ TBK_FAILED_URL: OneClick Inscription failed URL
 - `Content-Type: application/json`
 - `Authorization: Bearer {token}` (optional)
 
+### GET /health
+
+Endpoint for service health checks.
+
+```bash
+curl -i https://{host}/health
+```
+
 ### POST /inscription/create
 
 Body Params
