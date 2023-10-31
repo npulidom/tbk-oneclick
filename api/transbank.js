@@ -3,6 +3,7 @@
  */
 
 import { ObjectId } from 'mongodb'
+import UA from 'ua-parser-js'
 import xss from 'xss'
 
 import * as mongo from './mongo.js'
@@ -76,8 +77,12 @@ async function createInscription(req, res) {
 		userId = xss(userId).trim()
 		email  = xss(email).toLowerCase().trim()
 
+		if (!req.headers['user-agent']) throw 'MISSING_UA'
 		if (!ObjectId.isValid(userId)) throw 'INVALID_USER_ID_(OBJECT_ID)'
 		if (!isValidEmail(email))  throw 'INVALID_USER_EMAIL'
+
+		// parse user-agent
+		const { os, browser } = UA(req.headers['user-agent'])
 
 		// check if inscription already exists
 		if (await mongo.count(COLLECTION.inscriptions, { userId: new ObjectId(userId), state: 'success' })) throw 'ACTIVE_INSCRIPTION_EXISTS'
@@ -90,8 +95,10 @@ async function createInscription(req, res) {
 			createdAt: new Date(),
 			client   : {
 
-				ua: req.headers['user-agent'] || null,
-				ip: req.headers['x-forwarded-for'] || req.ip
+				...browser,
+				os: os.name || null,
+				uaRaw: req.headers['user-agent'],
+				ip: req.headers['x-forwarded-for'] || req.ip,
 			}
 		})
 
