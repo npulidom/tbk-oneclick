@@ -103,12 +103,12 @@ curl -iX POST -H 'Content-Type: application/json' -H 'Authorization: Bearer {API
 
 ```text
 # Credit Card
-4051885600446623 (trx exitosas)
-5186059559590568 (trx fallidas)
+4051885600446623 (success)
+5186059559590568 (fail)
 
 # Debit Card
-4051884239937763 (trx exitosas)
-5186008541233829 (trx fallidas)
+4051884239937763 (success)
+5186008541233829 (fail)
 
 # Commerce Codes (OneClick Mall)
 597055555541 (Mall)
