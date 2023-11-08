@@ -10,7 +10,7 @@ Container service for Transbank OneClick API using MongoDB as database storage.
 ```yml
 MONGO_URL: MongoDB URL, required (i.e. mongodb://mongo/app)
 BASE_URL: Base URL for cloud setup, a path in URL is supported (i.e. https://myservices.com/tbk-oneclick/)
-API_KEY: Service API Key
+API_KEY: Service API Key (required)
 ENCRYPTION_KEY: Key for URL encrypt/decrypt (optional, max. 32 chars)
 TBK_CODE: OneClick Mall Store Code for production (a.k.a código comercio)
 TBK_KEY: OneClick Mall API Key for production

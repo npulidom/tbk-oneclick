@@ -21,7 +21,6 @@ function setRoutes(app, basePath) {
 		await instance.register(bearerAuthPlugin, { keys: new Set([process.env.API_KEY]) })
 
 		// routes
-
 		await instance.post(`${basePath}inscription/create`, (req, res) => transbank.createInscription(req, res))
 
 		await instance.post(`${basePath}inscription/finish/:hash`, (req, res) => transbank.finishInscription(req, res))
