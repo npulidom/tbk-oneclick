@@ -8,7 +8,7 @@ import * as api       from './api/api.js'
 import * as transbank from './api/transbank.js'
 import * as utils     from './api/utils.js'
 
-// ++ Globals
+// ++ props
 const basePath = utils.basePath()
 const version  = process.env.BUILD_ID
 
