@@ -12,7 +12,8 @@ const LOGGER_ENV = {
 		level: 'debug',
 		transport: {
 
-			target: 'pino-pretty', options: { translateTime: 'HH:MM:ss', ignore: 'pid,hostname', colorize: true, singleLine: true }
+			target: 'pino-pretty',
+			options: { translateTime: 'HH:MM:ss', ignore: 'pid,hostname', colorize: true, singleLine: true }
 		}
 	},
 	production : {
@@ -73,7 +74,6 @@ async function shutdown() {
 	if (!app) return
 
 	app.log.info(`Server (shutdown) -> shutting down server ...`)
-
 	// close server
 	await app.close()
 }
