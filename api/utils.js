@@ -19,7 +19,13 @@ function baseUrl(path) {
 	// remove ending slash
 	if (baseUrl.endsWith('/')) baseUrl = baseUrl.substring(0, baseUrl.length - 1)
 
-	if (path) baseUrl += `/${path}`
+	if (path) {
+
+		// remove first slash
+		if (path.startsWith('/')) path = path.substring(1)
+
+		baseUrl += `/${path}`
+	}
 
 	// append ending slash
 	if (!baseUrl.endsWith('/')) baseUrl += '/'
