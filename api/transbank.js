@@ -85,13 +85,13 @@ async function createInscription(req, res) {
 		const { os, browser } = UA(req.headers['user-agent'])
 
 		// check if inscription already exists
-		if (await mongo.count(COLLECTION.inscriptions, { userId: new ObjectId(userId), state: 'success' })) throw 'ACTIVE_INSCRIPTION_EXISTS'
+		if (await mongo.count(COLLECTION.inscriptions, { userId: new ObjectId(userId), status: 'success' })) throw 'ACTIVE_INSCRIPTION_EXISTS'
 
 		// save pending inscription
 		const { insertedId } = await mongo.insertOne(COLLECTION.inscriptions, {
 
 			userId   : new ObjectId(userId),
-			state    : 'pending',
+			status   : 'pending',
 			createdAt: new Date(),
 			client   : {
 
@@ -147,7 +147,7 @@ async function finishInscription(req, res) {
 
 		if (!ObjectId.isValid(inscriptionId)) throw 'INVALID_HASH'
 
-		const inscription = await mongo.findOne(COLLECTION.inscriptions, { _id: new ObjectId(inscriptionId), state: 'pending' })
+		const inscription = await mongo.findOne(COLLECTION.inscriptions, { _id: new ObjectId(inscriptionId), status: 'pending' })
 
 		if (!inscription) throw 'PENDING_INSCRIPTION_NOT_FOUND'
 
@@ -162,7 +162,7 @@ async function finishInscription(req, res) {
 		// update inscription
 		await mongo.updateOne(COLLECTION.inscriptions, { _id: new ObjectId(inscriptionId) }, {
 
-			state     : 'success',
+			status    : 'success',
 			token     : response.tbk_user,
 			authCode  : response.authorization_code,
 			cardType  : response.card_type,
@@ -175,8 +175,8 @@ async function finishInscription(req, res) {
 	}
 	catch (e) {
 
-		// update state
-		if (inscriptionId) await mongo.updateOne(COLLECTION.inscriptions, { _id: new ObjectId(inscriptionId) }, { state: 'failed' })
+		// update status
+		if (inscriptionId) await mongo.updateOne(COLLECTION.inscriptions, { _id: new ObjectId(inscriptionId) }, { status: 'failed' })
 
 		req.log.error(`Transbank (finishInscription) -> exception: ${e.toString()}`)
 		res.redirect(`${process.env.TBK_FAILED_URL}?inscriptionId=${inscriptionId}`)
@@ -202,7 +202,7 @@ async function deleteInscription(req, res) {
 		if (!ObjectId.isValid(inscriptionId)) throw 'INVALID_INSCRIPTION_ID_(OBJECT_ID)'
 		if (!ObjectId.isValid(userId)) throw 'INVALID_USER_ID_(OBJECT_ID)'
 
-		const inscription = await mongo.findOne(COLLECTION.inscriptions, { _id: new ObjectId(inscriptionId), userId: new ObjectId(userId), state: 'success' })
+		const inscription = await mongo.findOne(COLLECTION.inscriptions, { _id: new ObjectId(inscriptionId), userId: new ObjectId(userId), status: 'success' })
 
 		if (!inscription) throw 'ACTIVE_INSCRIPTION_NOT_FOUND'
 
@@ -216,9 +216,9 @@ async function deleteInscription(req, res) {
 
 		req.log.info(`Transbank (deleteInscription) -> inscription[${inscriptionId}], response: ${JSON.stringify(response)}`)
 
-		// update state
+		// update status
 		if (response)
-			await mongo.updateOne(COLLECTION.inscriptions, { _id: new ObjectId(inscriptionId) }, { state: 'removed', removedAt: new Date() })
+			await mongo.updateOne(COLLECTION.inscriptions, { _id: new ObjectId(inscriptionId) }, { status: 'removed', removedAt: new Date() })
 
 		return { status: 'ok' }
 	}
@@ -227,9 +227,9 @@ async function deleteInscription(req, res) {
 		// not found special case
 		if (e.toString().match(/404/)) {
 
-			// update state
+			// update status
 			if (inscriptionId)
-				await mongo.updateOne(COLLECTION.inscriptions, { _id: new ObjectId(inscriptionId) }, { state: 'removed', removedAt: new Date() })
+				await mongo.updateOne(COLLECTION.inscriptions, { _id: new ObjectId(inscriptionId) }, { status: 'removed', removedAt: new Date() })
 
 			return { status: 'ok', message: 'inscription no longer exists in Transbank' }
 		}
@@ -274,9 +274,9 @@ async function charge(req, res) {
 
 		// get input inscription by ID or first found
 		if (inscriptionId && ObjectId.isValid(inscriptionId))
-			inscription = await mongo.findOne(COLLECTION.inscriptions, { _id: new ObjectId(inscriptionId), userId: new ObjectId(userId), state: 'success' })
+			inscription = await mongo.findOne(COLLECTION.inscriptions, { _id: new ObjectId(inscriptionId), userId: new ObjectId(userId), status: 'success' })
 		else
-			inscription = await mongo.findOne(COLLECTION.inscriptions, { userId: new ObjectId(userId), state: 'success' })
+			inscription = await mongo.findOne(COLLECTION.inscriptions, { userId: new ObjectId(userId), status: 'success' })
 
 		if (!inscription) throw 'ACTIVE_INSCRIPTION_NOT_FOUND'
 
