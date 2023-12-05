@@ -254,7 +254,7 @@ async function charge(req, res) {
 		commerceCode  = '', // child commerce code
 		buyOrder      = '',
 		amount        = 0,
-		shares        = 0,
+		shares        = 1,
 	} = req.body
 
 	try {
@@ -263,7 +263,7 @@ async function charge(req, res) {
 		buyOrder     = xss(buyOrder).trim()
 		commerceCode = xss(commerceCode).trim()
 		amount       = parseInt(amount) || 0
-		shares       = parseInt(shares) || 0
+		shares       = parseInt(shares) || 1
 
 		if (!ObjectId.isValid(userId)) throw 'INVALID_USER_ID_(OBJECT_ID)'
 		if (!commerceCode) throw 'INVALID_COMMERCE_CODE'
@@ -286,7 +286,7 @@ async function charge(req, res) {
 		req.log.info(`Transbank (charge) -> authorizing: buyOrder[${buyOrder}] inscription[${inscription._id}] cc[${commerceCode}] amount[${amount}] shares[${shares}]`)
 
 		// set TBK transaction (child buyOrder same as parent)
-		const details = [new TransactionDetail(amount, commerceCode, buyOrder, parseInt(shares) || 0)]
+		const details = [new TransactionDetail(amount, commerceCode, buyOrder, shares)]
 
 		// transbank API call
 		const mtrx = new Oneclick.MallTransaction(new Options(IntegrationCommerceCodes.ONECLICK_MALL, IntegrationApiKeys.WEBPAY, Environment.Integration))
@@ -315,7 +315,7 @@ async function charge(req, res) {
 			responseCode : response.details[0].response_code,
 			paymentType  : response.details[0].payment_type_code,
 			status       : response.details[0].status,
-			shares       : parseInt(response.details[0].installments_number) || 0,
+			shares       : parseInt(response.details[0].installments_number),
 			amount,
 			createdAt    : new Date(),
 		})
