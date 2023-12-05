@@ -16,6 +16,7 @@ TBK_CODE: OneClick Mall Store Code for production (a.k.a código comercio)
 TBK_KEY: OneClick Mall API Key for production
 TBK_SUCCESS_URL: OneClick Inscription success URL
 TBK_FAILED_URL: OneClick Inscription failed URL
+DEBUG_LOGS: Enable debug logs in production environment
 ```
 
 ## API Endpoints
