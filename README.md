@@ -106,10 +106,16 @@ curl -iX POST -H 'Content-Type: application/json' -H 'Authorization: Bearer {API
 # Credit Card
 4051885600446623 (success)
 5186059559590568 (fail)
+CV: 123
 
 # Debit Card
 4051884239937763 (success)
 5186008541233829 (fail)
+
+# Prepaid Card
+4051886000056590 (Visa success)
+5186174110629480 (Mastercard success)
+CV: 123
 
 # Commerce Codes (OneClick Mall)
 597055555541 (Mall)
