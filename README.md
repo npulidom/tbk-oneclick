@@ -5,7 +5,7 @@ Container service for Transbank OneClick API using MongoDB as database storage.
 - MongoDB v4+ required
 - For security reasons, prevent exposing this API directly at client-side applications.
 
-## Env vars
+## Env-vars
 
 ```yml
 MONGO_URL: MongoDB URL, required (i.e. mongodb://mongo/app)
