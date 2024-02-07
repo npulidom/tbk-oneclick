@@ -80,19 +80,15 @@ async function save(coll, doc) {
  * Update One
  * @param {string} coll - The input collection
  * @param {object} query - The query object
- * @param {object} doc - The input object
- * @param {string} op - The input operation
+ * @param {object} update - The update object
  * @returns {object}
  */
-async function updateOne(coll, query, doc, op = '$set') {
+async function updateOne(coll, query, update) {
 
 	if (typeof query._id == 'string' && /^[a-f\d]{24}$/i.test(query._id))
 		query._id = new ObjectId(query._id)
 
-	const cmd = {}
-	cmd[op] = doc
-
-	return await DB.collection(coll).updateOne(query, cmd)
+	return await DB.collection(coll).updateOne(query, update)
 }
 
 /**

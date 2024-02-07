@@ -159,15 +159,17 @@ async function finishInscription(req, res) {
 
 		if (response.response_code !== 0) throw `UNEXPECTED_TBK_RESPONSE_${response.response_code || 'NAN'}`
 
-		// update inscription
-		await mongo.updateOne(COLLECTION.inscriptions, { _id: new ObjectId(inscriptionId) }, {
+		const update = {
 
 			status    : 'success',
 			token     : response.tbk_user,
 			authCode  : response.authorization_code,
 			cardType  : response.card_type,
 			cardDigits: response.card_number.substring(response.card_number.length - 4) // last 4 digits
-		})
+		}
+
+		// update inscription
+		await mongo.updateOne(COLLECTION.inscriptions, { _id: new ObjectId(inscriptionId) }, { $set: update })
 
 		req.log.info(`Transbank (finishInscription) -> inscription[${inscriptionId}] finished successfully`)
 
@@ -176,7 +178,8 @@ async function finishInscription(req, res) {
 	catch (e) {
 
 		// update status
-		if (inscriptionId) await mongo.updateOne(COLLECTION.inscriptions, { _id: new ObjectId(inscriptionId) }, { status: 'failed' })
+		if (inscriptionId)
+			await mongo.updateOne(COLLECTION.inscriptions, { _id: new ObjectId(inscriptionId) }, { $set: { status: 'failed' } })
 
 		req.log.error(`Transbank (finishInscription) -> exception: ${e.toString()}`)
 		res.redirect(`${process.env.TBK_FAILED_URL}?inscriptionId=${inscriptionId}`)
@@ -218,7 +221,7 @@ async function deleteInscription(req, res) {
 
 		// update status
 		if (response)
-			await mongo.updateOne(COLLECTION.inscriptions, { _id: new ObjectId(inscriptionId) }, { status: 'removed', removedAt: new Date() })
+			await mongo.updateOne(COLLECTION.inscriptions, { _id: new ObjectId(inscriptionId) }, { $set: { status: 'removed', removedAt: new Date() } })
 
 		return { status: 'ok' }
 	}
@@ -229,7 +232,7 @@ async function deleteInscription(req, res) {
 
 			// update status
 			if (inscriptionId)
-				await mongo.updateOne(COLLECTION.inscriptions, { _id: new ObjectId(inscriptionId) }, { status: 'removed', removedAt: new Date() })
+				await mongo.updateOne(COLLECTION.inscriptions, { _id: new ObjectId(inscriptionId) }, { $set: { status: 'removed', removedAt: new Date() } })
 
 			return { status: 'ok', message: 'inscription no longer exists in Transbank' }
 		}
