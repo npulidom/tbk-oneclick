@@ -47,6 +47,7 @@ async function setup() {
 	// production credentials
 	if (process.env.TBK_CODE && process.env.TBK_KEY) {
 
+		console.log(`Transbank (setup) -> production mode, code: ${process.env.TBK_CODE}`)
 		Oneclick.configureForProduction(process.env.TBK_CODE, process.env.TBK_KEY)
 		return
 	}
