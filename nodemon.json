@@ -1,6 +1,6 @@
 {
 	"verbose": true,
-	"ignore": [],
+	"ext": "js",
 	"events": {
 		"start": "cls || clear"
 	}
