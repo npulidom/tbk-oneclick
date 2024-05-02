@@ -19,7 +19,9 @@ const COLLECTION = {
 	inscriptions: 'tbkOneClickIns',
 	transactions: 'tbkOneClickTrx',
 }
-
+// integration test code
+const TEST_COMMERCE_CODE = '597055555542'
+// env
 const IS_ENV_PROD = !!process.env.TBK_CODE && !!process.env.TBK_KEY
 
 /**
@@ -252,9 +254,11 @@ async function charge(req, res) {
 		shares       = parseInt(shares) || 1
 
 		if (!ObjectId.isValid(userId)) throw 'INVALID_USER_ID_(OBJECT_ID)'
-		if (!commerceCode) throw 'INVALID_COMMERCE_CODE'
 		if (!buyOrder) throw 'INVALID_BUY_ORDER'
 		if (!amount) throw 'INVALID_AMOUNT'
+
+		// default commerce code (integration)
+		if (!commerceCode) commerceCode = TEST_COMMERCE_CODE
 
 		let inscription
 
@@ -329,7 +333,7 @@ async function refund(req, res) {
 
 		userId       = '', // ObjectId as string
 		commerceCode = '', // child commerce code
-		buyOrder     = '',
+		buyOrder     = '', // saved buyOrder
 		amount       = '', // amount to refund
 	} = req.body
 
@@ -341,9 +345,11 @@ async function refund(req, res) {
 		amount       = parseInt(amount) || 0
 
 		if (!ObjectId.isValid(userId)) throw 'INVALID_USER_ID'
-		if (!commerceCode) throw 'INVALID_COMMERCE_CODE'
 		if (!buyOrder) throw 'INVALID_BUY_ORDER'
 		if (!amount) throw 'INVALID_AMOUNT'
+
+		// default commerce code (integration)
+		if (!commerceCode) commerceCode = TEST_COMMERCE_CODE
 
 		// check if payment has not processed yet
 		if (!await mongo.count(COLLECTION.transactions, { buyOrder, userId: new ObjectId(userId) })) throw 'BUY_ORDER_NOT_FOUND'
