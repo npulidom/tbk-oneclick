@@ -258,16 +258,17 @@ async function charge(req, res) {
 		if (!amount) throw 'INVALID_AMOUNT'
 
 		// default commerce code (integration)
-		if (!commerceCode) commerceCode = TEST_COMMERCE_CODE
+		if (!commerceCode)
+			commerceCode = IS_ENV_PROD ? process.env.TBK_CODE : TEST_COMMERCE_CODE
 
 		let inscription
-
 		// get input inscription by ID or first found
 		if (inscriptionId && ObjectId.isValid(inscriptionId))
 			inscription = await mongo.findOne(COLLECTION.inscriptions, { _id: new ObjectId(inscriptionId), userId: new ObjectId(userId), status: 'success' })
 		else
 			inscription = await mongo.findOne(COLLECTION.inscriptions, { userId: new ObjectId(userId), status: 'success' })
 
+		// check inscription object
 		if (!inscription) throw 'ACTIVE_INSCRIPTION_NOT_FOUND'
 
 		// check if payment has not processed yet
@@ -349,7 +350,8 @@ async function refund(req, res) {
 		if (!amount) throw 'INVALID_AMOUNT'
 
 		// default commerce code (integration)
-		if (!commerceCode) commerceCode = TEST_COMMERCE_CODE
+		if (!commerceCode)
+			commerceCode = IS_ENV_PROD ? process.env.TBK_CODE : TEST_COMMERCE_CODE
 
 		// check if payment has not processed yet
 		if (!await mongo.count(COLLECTION.transactions, { buyOrder, userId: new ObjectId(userId) })) throw 'BUY_ORDER_NOT_FOUND'
