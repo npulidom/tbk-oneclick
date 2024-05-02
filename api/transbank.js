@@ -6,16 +6,9 @@ import { ObjectId } from 'mongodb'
 import UA from 'ua-parser-js'
 import xss from 'xss'
 
-import {
-
-	Oneclick,
-	Options,
-	IntegrationCommerceCodes,
-	IntegrationApiKeys,
-	Environment,
-	TransactionDetail
-
-} from 'transbank-sdk'
+import tbk from 'transbank-sdk'
+// common-js lib restriction
+const { Oneclick, TransactionDetail } = tbk
 
 import * as mongo from './mongo.js'
 import { baseUrl, isValidEmail, encrypt, decrypt } from './utils.js'
@@ -24,8 +17,10 @@ import { baseUrl, isValidEmail, encrypt, decrypt } from './utils.js'
 const COLLECTION = {
 
 	inscriptions: 'tbkOneClickIns',
-	transactions: 'tbkOneClickTrx'
+	transactions: 'tbkOneClickTrx',
 }
+
+const IS_ENV_PROD = !!process.env.TBK_CODE && !!process.env.TBK_KEY
 
 /**
  * Setup
@@ -38,16 +33,13 @@ async function setup() {
 	if (!process.env.TBK_SUCCESS_URL) throw 'INVALID_TBK_SUCCESS_URL'
 	if (!process.env.TBK_FAILED_URL) throw 'INVALID_TBK_FAILED_URL'
 
-	// production credentials
-	if (process.env.TBK_CODE && process.env.TBK_KEY) {
-
-		console.log(`Transbank (setup) -> production mode, code: ${process.env.TBK_CODE}, tbk-key: ${process.env.TBK_KEY.substring(0, 3)} ...`)
-		Oneclick.configureForProduction(process.env.TBK_CODE, process.env.TBK_KEY)
-		return
-	}
-
 	// testing
-	Oneclick.configureOneclickMallForTesting()
+	if (!IS_ENV_PROD)
+		return Oneclick.configureOneclickMallForTesting()
+
+	// production credentials
+	console.log(`Transbank (setup) -> production mode, code: ${process.env.TBK_CODE}, tbk-key: ${process.env.TBK_KEY.substring(0, 3)} ...`)
+	Oneclick.configureForProduction(process.env.TBK_CODE, process.env.TBK_KEY)
 }
 
 /**
@@ -99,7 +91,7 @@ async function createInscription(req, res) {
 		const finishUrl = baseUrl(`inscription/finish/${hash}`)
 
 		// transbank API call
-		const ins = new Oneclick.MallInscription(new Options(IntegrationCommerceCodes.ONECLICK_MALL, IntegrationApiKeys.WEBPAY, Environment.Integration))
+		const ins = new Oneclick.MallInscription(Oneclick.options)
 		const { token, url_webpay: url } = await ins.start(userId, email, finishUrl)
 
 		if (!token || !url) throw 'UNEXPECTED_TBK_RESPONSE'
@@ -141,11 +133,10 @@ async function finishInscription(req, res) {
 		if (!ObjectId.isValid(inscriptionId)) throw 'INVALID_HASH'
 
 		const inscription = await mongo.findOne(COLLECTION.inscriptions, { _id: new ObjectId(inscriptionId), status: 'pending' })
-
 		if (!inscription) throw 'PENDING_INSCRIPTION_NOT_FOUND'
 
 		// transbank API call
-		const ins = new Oneclick.MallInscription(new Options(IntegrationCommerceCodes.ONECLICK_MALL, IntegrationApiKeys.WEBPAY, Environment.Integration))
+		const ins = new Oneclick.MallInscription(Oneclick.options)
 		const response = await ins.finish(TBK_TOKEN)
 
 		req.log.info(`Transbank (finishInscription) -> response code: ${response.response_code || 'n/a'}`)
@@ -199,7 +190,6 @@ async function deleteInscription(req, res) {
 		if (!ObjectId.isValid(userId)) throw 'INVALID_USER_ID_(OBJECT_ID)'
 
 		const inscription = await mongo.findOne(COLLECTION.inscriptions, { _id: new ObjectId(inscriptionId), userId: new ObjectId(userId), status: 'success' })
-
 		if (!inscription) throw 'ACTIVE_INSCRIPTION_NOT_FOUND'
 
 		const { token } = inscription
@@ -207,7 +197,7 @@ async function deleteInscription(req, res) {
 		req.log.info(`Transbank (deleteInscription) -> new request, token: ****${token.substring(token.length - 6)}, userId: ${userId}`)
 
 		// transbank API call
-		const ins = new Oneclick.MallInscription(new Options(IntegrationCommerceCodes.ONECLICK_MALL, IntegrationApiKeys.WEBPAY, Environment.Integration))
+		const ins = new Oneclick.MallInscription(Oneclick.options)
 		const response = await ins.delete(token, userId)
 
 		req.log.info(`Transbank (deleteInscription) -> inscription[${inscriptionId}], response: ${JSON.stringify(response)}`)
@@ -283,9 +273,8 @@ async function charge(req, res) {
 
 		// set TBK transaction (child buyOrder same as parent)
 		const details = [new TransactionDetail(amount, commerceCode, buyOrder, shares)]
-
 		// transbank API call
-		const mtrx = new Oneclick.MallTransaction(new Options(IntegrationCommerceCodes.ONECLICK_MALL, IntegrationApiKeys.WEBPAY, Environment.Integration))
+		const mtrx     = new Oneclick.MallTransaction(Oneclick.options)
 		const response = await mtrx.authorize(
 
 			inscription.userId.toString(),
@@ -362,7 +351,7 @@ async function refund(req, res) {
 		req.log.info(`Transbank (refund) -> refunding buyOrder ${buyOrder} ...`)
 
 		// transbank API call
-		const mtrx = new Oneclick.MallTransaction(new Options(IntegrationCommerceCodes.ONECLICK_MALL, IntegrationApiKeys.WEBPAY, Environment.Integration))
+		const mtrx     = new Oneclick.MallTransaction(Oneclick.options)
 		const response = await mtrx.refund(buyOrder, commerceCode, buyOrder, amount)
 
 		req.log.info(`Transbank (refund) -> order ${buyOrder}, response type: ${response.type || 'n/a'}`)
