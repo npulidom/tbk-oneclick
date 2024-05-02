@@ -373,7 +373,6 @@ async function refund(req, res) {
 		req.log.warn(`Transbank (refund) -> exception: ${e.toString()}`)
 
 		if (e.toString().match(/NULLIFIED/)) return { status: 'ok', message: 'transaction partially refunded' }
-
 		// possible already refunded
 		if (e.toString().match(/422/)) return { status: 'ok', message: 'transaction already refunded or business logic inconsistency' }
 
