@@ -30,9 +30,6 @@ const COLLECTION = {
 	transactions: 'tbkOneClickTrx'
 }
 
-// ++ props
-let certMode = false
-
 /**
  * Setup
  * @returns {undefined}
@@ -47,15 +44,13 @@ async function setup() {
 	// production credentials
 	if (process.env.TBK_CODE && process.env.TBK_KEY) {
 
-		console.log(`Transbank (setup) -> production mode, code: ${process.env.TBK_CODE}`)
+		console.log(`Transbank (setup) -> production mode, code: ${process.env.TBK_CODE}, tbk-key: ${process.env.TBK_KEY.substring(0, 3)} ...`)
 		Oneclick.configureForProduction(process.env.TBK_CODE, process.env.TBK_KEY)
 		return
 	}
 
 	// testing
 	Oneclick.configureOneclickMallForTesting()
-	// set cert mode
-	certMode = true
 }
 
 /**
