@@ -6,13 +6,7 @@ import { ObjectId } from 'mongodb'
 import UA from 'ua-parser-js'
 import xss from 'xss'
 
-import * as mongo from './mongo.js'
-import { baseUrl, isValidEmail, encrypt, decrypt } from './utils.js'
-
-// transbank common-js module import
-import { createRequire } from 'module'
-const require = createRequire(import.meta.url)
-const {
+import {
 
 	Oneclick,
 	Options,
@@ -21,7 +15,10 @@ const {
 	Environment,
 	TransactionDetail
 
-} = require('transbank-sdk')
+} from 'transbank-sdk'
+
+import * as mongo from './mongo.js'
+import { baseUrl, isValidEmail, encrypt, decrypt } from './utils.js'
 
 // ++ consts
 const COLLECTION = {
