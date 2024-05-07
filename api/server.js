@@ -16,7 +16,7 @@ const LOGGER_ENV = {
 			options: { translateTime: 'HH:MM:ss', ignore: 'pid,hostname', colorize: true, singleLine: true }
 		}
 	},
-	production : {
+	production: {
 
 		level: parseInt(process.env.DEBUG_LOGS || 0) ? 'debug' : 'info'
 	}
