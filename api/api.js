@@ -32,7 +32,7 @@ function setRoutes(app, basePath) {
 		await instance.post(`${basePath}inscription/refund`, (req, res) => transbank.refund(req, res))
 	})
 
-	// no bearer auth required
+	// GET - no bearer auth required
 	app.get(`${basePath}inscription/finish/:hash`, (req, res) => transbank.finishInscription(req, res))
 
 	return app

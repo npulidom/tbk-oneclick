@@ -11,7 +11,9 @@ import tbk from 'transbank-sdk'
 const { Oneclick, TransactionDetail } = tbk
 
 import * as mongo from './mongo.js'
-import { baseUrl, isValidEmail, encrypt, decrypt } from './utils.js'
+import * as server from './server.js'
+
+import { isValidEmail, encrypt, decrypt } from './utils.js'
 
 // ++ consts
 const COLLECTION = {
@@ -40,7 +42,9 @@ async function setup() {
 		return Oneclick.configureOneclickMallForTesting()
 
 	// production credentials
-	console.log(`Transbank (setup) -> production mode, code: ${process.env.TBK_CODE}, tbk-key: ${process.env.TBK_KEY.substring(0, 3)} ...`)
+	console.log(`Transbank (setup) -> production mode, code: ${process.env.TBK_CODE}, ` +
+													`tbk-key: ${process.env.TBK_KEY.substring(0, 3)} ...`)
+
 	Oneclick.configureForProduction(process.env.TBK_CODE, process.env.TBK_KEY)
 }
 
@@ -90,7 +94,7 @@ async function createInscription(req, res) {
 		})
 
 		const hash      = encrypt(insertedId.toString())
-		const finishUrl = baseUrl(`inscription/finish/${hash}`)
+		const finishUrl = server.getBaseUrl(`inscription/finish/${hash}`)
 
 		// transbank API call
 		const ins = new Oneclick.MallInscription(Oneclick.options)
@@ -273,7 +277,8 @@ async function charge(req, res) {
 		// check if payment has not processed yet
 		if (await mongo.count(COLLECTION.transactions, { buyOrder })) throw 'BUY_ORDER_ALREADY_PROCESSED'
 
-		req.log.info(`Transbank (charge) -> authorizing: buyOrder[${buyOrder}] inscription[${inscription._id}] cc[${commerceCode}] amount[${amount}] shares[${shares}]`)
+		req.log.info(`Transbank (charge) -> authorizing: buyOrder[${buyOrder}] inscription[${inscription._id}] ` +
+						`cc[${commerceCode}] amount[${amount}] shares[${shares}]`)
 
 		// set TBK transaction (child buyOrder same as parent)
 		const details = [new TransactionDetail(amount, commerceCode, buyOrder, shares)]

@@ -6,10 +6,9 @@ import * as mongo     from './api/mongo.js'
 import * as server    from './api/server.js'
 import * as api       from './api/api.js'
 import * as transbank from './api/transbank.js'
-import * as utils     from './api/utils.js'
 
 // ++ props
-const basePath = utils.basePath()
+const basePath = server.getBasePath()
 const version  = process.env.BUILD_ID
 
 /**
@@ -20,7 +19,7 @@ async function init() {
 	/**
 	 * Setup
 	 */
-	const app = await server.create(basePath)
+	const app = await server.create()
 	// mongo
 	await mongo.connect()
 	// transbank
@@ -31,18 +30,15 @@ async function init() {
 	 */
 	app.addHook('onRequest', async (req, res) => {
 
-		// * OPTIONS preflight CORS
-		if (req.method == 'OPTIONS') {
-
-			server.setCorsHeaders(res)
-			return res.send()
-		}
-
-		// * POST method CORS
-		if (req.method == 'POST') {
-
-			server.setCorsHeaders(res)
+		// * health endpoint exception
+		if (/\/health$/.test(req.routeOptions.url))
 			return
+
+		// * OPTIONS preflight / POST (CORS)
+		if (/OPTIONS|POST/.test(req.method)) {
+
+			server.setCorsHeaders(res)
+			res.code(200)
 		}
 	})
 

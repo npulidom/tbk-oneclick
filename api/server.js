@@ -30,7 +30,10 @@ let app = null
  * @param {string} basePath - The base path for static assets setup
  * @returns {object}
  */
-async function create(basePath) {
+async function create() {
+
+	// get base path
+	const basePath = getBasePath()
 
 	// new server instance
 	app = fastify({
@@ -47,10 +50,51 @@ async function create(basePath) {
 
 	app.get(`/health`, healthCheck)
 	// public health check
-	if (basePath != '/') app.get(`${basePath}health`, healthCheck)
+	if (basePath != '/')
+		app.get(`${basePath}health`, healthCheck)
 
 	// return instance
 	return app
+}
+
+/**
+ * Gets the Base Path
+ * @returns {string}
+ */
+function getBasePath() {
+
+	let { pathname } = new URL(process.env.BASE_URL)
+
+	// append ending slash
+	if (!pathname.endsWith('/')) pathname += '/'
+
+	return pathname
+}
+
+/**
+ * Gets the Base URL
+ * @param {string} path - An input path
+ * @returns {string}
+ */
+function getBaseUrl(path) {
+
+	let url = process.env.BASE_URL
+
+	// remove ending slash
+	if (url.endsWith('/')) url = url.substring(0, url.length - 1)
+
+	if (path) {
+
+		// remove first slash
+		if (path.startsWith('/')) path = path.substring(1)
+
+		url += `/${path}`
+	}
+
+	// append ending slash
+	if (!url.endsWith('/')) url += '/'
+
+	return url
 }
 
 /**
@@ -58,9 +102,9 @@ async function create(basePath) {
  * @param {object} res - The response object
  * @returns {undefined}
  */
-function setCorsHeaders(res) {
+function setCorsHeaders(res, origin = '*') {
 
-	res.header('Access-Control-Allow-Origin', '*')
+	res.header('Access-Control-Allow-Origin', origin)
 	res.header('Access-Control-Allow-Methods', 'OPTIONS, HEAD, GET, POST')
 	res.header('Access-Control-Allow-Headers', 'Content-Type, Origin, Referer, X-Requested-With, Authorization')
 }
@@ -85,6 +129,8 @@ export {
 
 	app,
 	create,
+	getBasePath,
+	getBaseUrl,
 	setCorsHeaders,
 	shutdown,
 }

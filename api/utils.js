@@ -8,46 +8,6 @@ import crypto from 'crypto'
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || crypto.randomBytes(16).toString('hex')
 
 /**
- * Base URL
- * @param {string} path - An input path
- * @returns {string}
- */
-function baseUrl(path) {
-
-	let baseUrl = process.env.BASE_URL
-
-	// remove ending slash
-	if (baseUrl.endsWith('/')) baseUrl = baseUrl.substring(0, baseUrl.length - 1)
-
-	if (path) {
-
-		// remove first slash
-		if (path.startsWith('/')) path = path.substring(1)
-
-		baseUrl += `/${path}`
-	}
-
-	// append ending slash
-	if (!baseUrl.endsWith('/')) baseUrl += '/'
-
-	return baseUrl
-}
-
-/**
- * Base path
- * @returns {string}
- */
-function basePath() {
-
-	let { pathname } = new URL(process.env.BASE_URL)
-
-	// append ending slash
-	if (!pathname.endsWith('/')) pathname += '/'
-
-	return pathname
-}
-
-/**
  * Email Validator
  * @param {string} email - An input email
  * @returns {string}
@@ -97,8 +57,6 @@ function decrypt(text) {
  */
 export {
 
-	baseUrl,
-	basePath,
 	isValidEmail,
 	encrypt,
 	decrypt,

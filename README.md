@@ -3,7 +3,7 @@
 Container service for Transbank OneClick API using MongoDB as database storage.
 
 - MongoDB v4+ required
-- For security reasons, prevent exposing this API directly at client-side applications.
+- NOTE: For security reasons, prevent exposing this API directly at client-side applications.
 
 ## Env-vars
 
