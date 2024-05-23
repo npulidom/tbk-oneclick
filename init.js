@@ -41,6 +41,13 @@ async function init() {
 			res.code(200)
 		}
 	})
+	// on-send event
+	app.addHook('onSend', async (req, res, payload) => {
+
+		// application error default status code
+		if (res.statusCode == 200 && /"status":"error"/.test(payload))
+			res.code(418)
+	})
 
 	/**
 	 * Extend app routes
