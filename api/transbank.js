@@ -365,7 +365,7 @@ async function refund(req, res) {
 		const mtrx     = new Oneclick.MallTransaction(Oneclick.options)
 		const response = await mtrx.refund(buyOrder, commerceCode, buyOrder, amount)
 
-		req.log.info(`Transbank (refund) -> order ${buyOrder}, response type: ${response.type || 'n/a'}`)
+		req.log.info(`Transbank (refund) -> order ${buyOrder}, response: ${JSON.stringify(response)}`)
 
 		if (!/REVERSED|NULLIFIED/.test(response.type)) throw `UNEXPECTED_TBK_RESPONSE_${response.type || 'NAN'}`
 
