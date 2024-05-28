@@ -367,19 +367,19 @@ async function refund(req, res) {
 
 		req.log.info(`Transbank (refund) -> order ${buyOrder}, response type: ${response.type || 'n/a'}`)
 
-		if (response.type != 'REVERSED') throw `UNEXPECTED_TBK_RESPONSE_${response.type || 'NAN'}`
+		if (!/REVERSED|NULLIFIED/.test(response.type)) throw `UNEXPECTED_TBK_RESPONSE_${response.type || 'NAN'}`
 
 		req.log.info(`Transbank (refund) -> buyOrder ${buyOrder} refunded successfully!`)
 
-		return { status: 'ok' }
+		return { status: 'ok', response }
 	}
 	catch (e) {
 
 		req.log.warn(`Transbank (refund) -> exception: ${e.toString()}`)
 
-		if (e.toString().match(/NULLIFIED/)) return { status: 'ok', message: 'transaction partially refunded' }
-		// possible already refunded
-		if (e.toString().match(/422/)) return { status: 'ok', message: 'transaction already refunded or business logic inconsistency' }
+		// special case, possible already refunded
+		if (e.toString().match(/422/))
+			return { status: 'ok', message: 'transaction already refunded or business logic inconsistency' }
 
 		return { status: 'error', error: e.toString().replace(/\n/g, '. ') }
 	}
