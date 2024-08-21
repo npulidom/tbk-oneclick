@@ -199,6 +199,7 @@ async function deleteInscription(req, res) {
 		if (!inscription) throw 'ACTIVE_INSCRIPTION_NOT_FOUND'
 
 		const { token } = inscription
+		if (!token) throw 'MISSING_INSCRIPTION_TOKEN_PROP'
 
 		req.log.info(`Transbank (deleteInscription) -> new request, token: ****${token.substring(token.length - 6)}, userId: ${userId}`)
 
@@ -273,6 +274,7 @@ async function charge(req, res) {
 
 		// check inscription object
 		if (!inscription) throw 'ACTIVE_INSCRIPTION_NOT_FOUND'
+		if (!inscription.token) throw 'MISSING_INSCRIPTION_TOKEN_PROP'
 
 		// check if payment has not processed yet
 		if (await mongo.count(COLLECTION.transactions, { buyOrder })) throw 'BUY_ORDER_ALREADY_PROCESSED'
