@@ -19,6 +19,20 @@ TBK_FAILED_URL: OneClick Inscription failed URL
 DEBUG_LOGS: Enable debug logs in production environment
 ```
 
+## Usage
+
+Pull image
+
+```bash
+docker pull npulidom/tbk-oneclick
+```
+
+Run the container
+
+```bash
+docker run -p 8080:80 --env-file .env npulidom/tbk-oneclick
+```
+
 ## API Endpoints
 
 ### Headers
