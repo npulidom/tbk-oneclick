@@ -53,8 +53,7 @@ async function setup() {
 		return Oneclick.configureOneclickMallForTesting()
 
 	// production credentials
-	console.log(`Transbank (setup) -> production mode, code: ${process.env.TBK_CODE}, ` +
-													`tbk-key: ${process.env.TBK_KEY.substring(0, 3)} ...`)
+	console.log(`Transbank (setup) -> production mode, code=${process.env.TBK_CODE} tbk-key=${process.env.TBK_KEY.substring(0, 3)}****`)
 
 	Oneclick.configureForProduction(process.env.TBK_CODE, process.env.TBK_KEY)
 }
@@ -80,8 +79,8 @@ async function createInscription(req, res) {
 		email  = xss(email).toLowerCase().trim()
 
 		if (!req.headers['user-agent']) throw 'MISSING_UA'
-		if (!ObjectId.isValid(userId)) throw 'INVALID_USER_ID_(OBJECT_ID)'
-		if (!isValidEmail(email))  throw 'INVALID_USER_EMAIL'
+		if (!ObjectId.isValid(userId)) throw 'INVALID_USER_ID'
+		if (!isValidEmail(email)) throw 'INVALID_USER_EMAIL'
 
 		// parse user-agent
 		const { os, browser } = UA(req.headers['user-agent'])
@@ -113,14 +112,14 @@ async function createInscription(req, res) {
 
 		if (!token || !url) throw 'UNEXPECTED_TBK_RESPONSE'
 
-		req.log.debug(`Transbank (createInscription) -> response received, token: ${token}`)
-		req.log.info(`Transbank (createInscription) -> 'pending' inscription ${insertedId.toString()} created!`)
+		req.log.debug(`Transbank (createInscription) -> response received, token=${token}`)
+		req.log.info(`Transbank (createInscription) -> created 'pending' inscription, id=${insertedId.toString()}`)
 
 		return { status: 'ok', url, token }
 	}
 	catch (e) {
 
-		req.log.error(`Transbank (createInscription) -> exception ${e.toString()}`)
+		req.log.error(`Transbank (createInscription) -> exception: ${e.toString()}`)
 		return { status: 'error', error: e.toString().replace(/\n/g, '. ') }
 	}
 }
@@ -145,7 +144,7 @@ async function finishInscription(req, res) {
 		// decrypt inscription id
 		inscriptionId = decrypt(hash)
 
-		req.log.debug(`Transbank (finishInscription) -> params: inscription[${inscriptionId}] tbk-token[${TBK_TOKEN}]`)
+		req.log.debug(`Transbank (finishInscription) -> params, inscription=${inscriptionId} tbk-token=${TBK_TOKEN}`)
 
 		if (!ObjectId.isValid(inscriptionId)) throw 'INVALID_HASH'
 
@@ -156,7 +155,7 @@ async function finishInscription(req, res) {
 		const ins = new Oneclick.MallInscription(Oneclick.options)
 		const response = await ins.finish(TBK_TOKEN)
 
-		req.log.info(`Transbank (finishInscription) -> response code: ${response.response_code || 'n/a'}`)
+		req.log.info(`Transbank (finishInscription) -> response code=${response.response_code || 'n/a'}`)
 
 		if (response.response_code !== 0) throw `UNEXPECTED_TBK_RESPONSE_${response.response_code || 'NAN'}`
 
@@ -172,7 +171,7 @@ async function finishInscription(req, res) {
 		// update inscription
 		await mongo.updateOne(COLLECTION.inscriptions, { _id: new ObjectId(inscriptionId) }, { $set: update })
 
-		req.log.info(`Transbank (finishInscription) -> inscription[${inscriptionId}] finished successfully`)
+		req.log.info(`Transbank (finishInscription) -> inscription finished successfully, id=${inscriptionId}`)
 
 		res.redirect(`${process.env.TBK_SUCCESS_URL}?inscriptionId=${inscriptionId}`)
 	}
@@ -203,8 +202,8 @@ async function deleteInscription(req, res) {
 
 	try {
 
-		if (!ObjectId.isValid(inscriptionId)) throw 'INVALID_INSCRIPTION_ID_(OBJECT_ID)'
-		if (!ObjectId.isValid(userId)) throw 'INVALID_USER_ID_(OBJECT_ID)'
+		if (!ObjectId.isValid(inscriptionId)) throw 'INVALID_INSCRIPTION_ID'
+		if (!ObjectId.isValid(userId)) throw 'INVALID_USER_ID'
 
 		const inscription = await mongo.findOne(COLLECTION.inscriptions, { _id: new ObjectId(inscriptionId), userId: new ObjectId(userId), status: 'success' })
 		if (!inscription) throw 'ACTIVE_INSCRIPTION_NOT_FOUND'
@@ -212,13 +211,13 @@ async function deleteInscription(req, res) {
 		const { token } = inscription
 		if (!token) throw 'MISSING_INSCRIPTION_TOKEN_PROP'
 
-		req.log.info(`Transbank (deleteInscription) -> new request, token: ****${token.substring(token.length - 6)}, userId: ${userId}`)
+		req.log.info(`Transbank (deleteInscription) -> new request, token=****${token.substring(token.length - 6)} userId=${userId}`)
 
 		// transbank API call
 		const ins = new Oneclick.MallInscription(Oneclick.options)
 		const response = await ins.delete(token, userId)
 
-		req.log.info(`Transbank (deleteInscription) -> inscription[${inscriptionId}], response: ${JSON.stringify(response)}`)
+		req.log.info(`Transbank (deleteInscription) -> response: ${JSON.stringify(response)}, inscription=${inscriptionId}`)
 
 		// update status
 		if (response)
@@ -269,7 +268,7 @@ async function charge(req, res) {
 		amount       = parseInt(amount) || 0
 		shares       = parseInt(shares) || 1
 
-		if (!ObjectId.isValid(userId)) throw 'INVALID_USER_ID_(OBJECT_ID)'
+		if (!ObjectId.isValid(userId)) throw 'INVALID_USER_ID'
 		if (!buyOrder) throw 'INVALID_BUY_ORDER'
 		if (!amount) throw 'INVALID_AMOUNT'
 
@@ -290,8 +289,8 @@ async function charge(req, res) {
 		// check if payment has not processed yet
 		if (await mongo.count(COLLECTION.transactions, { buyOrder })) throw 'BUY_ORDER_ALREADY_PROCESSED'
 
-		req.log.info(`Transbank (charge) -> authorizing: buyOrder[${buyOrder}] inscription[${inscription._id}] ` +
-						`cc[${commerceCode}] amount[${amount}] shares[${shares}]`)
+		req.log.info(`Transbank (charge) -> authorizing trx, buyOrder=${buyOrder} inscriptionId=${inscription._id} ` +
+						`cc=${commerceCode} amount=${amount} shares=${shares}`)
 
 		// set TBK transaction (child buyOrder same as parent)
 		const details = [new TransactionDetail(amount, commerceCode, buyOrder, shares)]
@@ -308,7 +307,7 @@ async function charge(req, res) {
 		if (!response.details?.length) throw `UNEXPECTED_TBK_RESPONSE`
 		if (response.details[0].response_code !== 0) throw `UNEXPECTED_TBK_RESPONSE_${response.details[0].response_code || 'NAN'}`
 
-		req.log.info(`Transbank (charge) -> buyOrder ${buyOrder} authorized successfully!`)
+		req.log.info(`Transbank (charge) -> trx authorized successfully! buyOrder=${buyOrder}`)
 
 		// save pending inscription
 		const { insertedId } = await mongo.insertOne(COLLECTION.transactions, {
@@ -373,17 +372,18 @@ async function refund(req, res) {
 		if (!await mongo.count(COLLECTION.transactions, { buyOrder, userId: new ObjectId(userId) }))
 			throw 'BUY_ORDER_NOT_FOUND'
 
-		req.log.info(`Transbank (refund) -> refunding buyOrder ${buyOrder} ...`)
+		req.log.info(`Transbank (refund) -> refunding order, buyOrder=${buyOrder}`)
 
 		// transbank API call
 		const mtrx     = new Oneclick.MallTransaction(Oneclick.options)
 		const response = await mtrx.refund(buyOrder, commerceCode, buyOrder, amount)
 
-		req.log.info(`Transbank (refund) -> order ${buyOrder}, response: ${JSON.stringify(response)}`)
+		req.log.info(`Transbank (refund) -> response ok: ${JSON.stringify(response)}, buyOrder=${buyOrder}`)
 
-		if (!/REVERSED|NULLIFIED/.test(response.type)) throw `UNEXPECTED_TBK_RESPONSE_${response.type || 'NAN'}`
+		if (!/REVERSED|NULLIFIED/.test(response.type))
+			throw `UNEXPECTED_TBK_RESPONSE_${response.type || 'NAN'}`
 
-		req.log.info(`Transbank (refund) -> buyOrder ${buyOrder} refunded successfully!`)
+		req.log.info(`Transbank (refund) -> order refunded successfully! buyOrder=${buyOrder}`)
 
 		return { status: 'ok', response }
 	}
