@@ -15,16 +15,27 @@ import * as server from './server.js'
 
 import { isValidEmail, encrypt, decrypt } from './utils.js'
 
-// ++ consts
+/**
+ * Collection
+ * @constant {object} COLLECTION - The collection names
+ */
 const COLLECTION = {
 
 	inscriptions: 'tbkOneClickIns',
 	transactions: 'tbkOneClickTrx',
 }
-// integration test code
-const TEST_COMMERCE_CODE = '597055555542'
-// env
+
+/**
+ * Production Environment
+ * @constant {boolean} IS_ENV_PROD - Flag for production environment
+ */
 const IS_ENV_PROD = !!process.env.TBK_CODE && !!process.env.TBK_KEY
+
+/**
+ * Test Commerce Code
+ * @constant {string} TEST_COMMERCE_CODE - The test commerce code
+ */
+const TEST_COMMERCE_CODE = '597055555542'
 
 /**
  * Setup
@@ -233,7 +244,7 @@ async function deleteInscription(req, res) {
 }
 
 /**
- * Charge
+ * Inscription Charge
  * @param {object} req - The request object
  * @param {object} res - The response object
  * @returns {undefined}
@@ -329,7 +340,7 @@ async function charge(req, res) {
 }
 
 /**
- * Refund
+ * Refund transaction
  * @param {object} req - The request object
  * @param {object} res - The response object
  * @returns {undefined}
@@ -359,7 +370,8 @@ async function refund(req, res) {
 		if (!commerceCode) commerceCode = TEST_COMMERCE_CODE
 
 		// check if payment has not processed yet
-		if (!await mongo.count(COLLECTION.transactions, { buyOrder, userId: new ObjectId(userId) })) throw 'BUY_ORDER_NOT_FOUND'
+		if (!await mongo.count(COLLECTION.transactions, { buyOrder, userId: new ObjectId(userId) }))
+			throw 'BUY_ORDER_NOT_FOUND'
 
 		req.log.info(`Transbank (refund) -> refunding buyOrder ${buyOrder} ...`)
 

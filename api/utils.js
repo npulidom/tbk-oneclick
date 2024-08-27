@@ -4,7 +4,10 @@
 
 import crypto from 'crypto'
 
-// ++ consts
+/**
+ * Encryption Key
+ * @constant {string} ENCRYPTION_KEY - Some crypto key
+ */
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || crypto.randomBytes(16).toString('hex')
 
 /**

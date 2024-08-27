@@ -7,9 +7,17 @@ import * as server    from './api/server.js'
 import * as api       from './api/api.js'
 import * as transbank from './api/transbank.js'
 
-// ++ props
-const basePath = server.getBasePath()
-const version  = process.env.BUILD_ID
+/**
+ * Base Path
+ * @constant {string} BASE_PATH - The base path
+ */
+const BASE_PATH = server.getBasePath()
+
+/**
+ * Version
+ * @constant {string} VERSION - The build version
+ */
+const VERSION = process.env.BUILD_ID
 
 /**
  * Init App
@@ -52,7 +60,7 @@ async function init() {
 	/**
 	 * Extend app routes
 	 */
-	api.setRoutes(app, basePath)
+	api.setRoutes(app, BASE_PATH)
 
 	/**
 	 * Handler - Not Found
@@ -72,7 +80,7 @@ async function init() {
 
 	// start server
 	await app.listen({ port: 80, host: '0.0.0.0' })
-	app.log.info(`Init -> server is up since ${new Date().toString()}, base-path: ${basePath}, version: ${version}`)
+	app.log.info(`Init -> server-up, date=${new Date().toString()} base-path=${BASE_PATH} version=${VERSION}`)
 }
 
 /**

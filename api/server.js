@@ -4,7 +4,10 @@
 
 import fastify from 'fastify'
 
-// ++ consts
+/**
+ * Logger Environment
+ * @constant {object} LOGGER_ENV - The logger environment for pino
+ */
 const LOGGER_ENV = {
 
 	development: {
@@ -22,8 +25,11 @@ const LOGGER_ENV = {
 	}
 }
 
-// ++ props
-let app = null
+/**
+ * The application instance
+ * @property {object} app - The app instance
+ */
+let app
 
 /**
  * Create Server

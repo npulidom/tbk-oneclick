@@ -4,8 +4,11 @@
 
 import { MongoClient, ObjectId } from 'mongodb'
 
-// ++ props
-let DB = null
+/**
+ * Database Instance
+ * @property {object} DB - The database instance
+ */
+let DB
 
 /**
  * DB Connect
