@@ -10,11 +10,11 @@
 	},
 	"dependencies": {
 		"@fastify/bearer-auth": "~9.4.0",
-		"fastify": "~4.26.2",
+		"fastify": "~4.28.1",
 		"mongodb": "~5.9.2",
-		"pino-pretty": "~11.0.0",
+		"pino-pretty": "~11.2.2",
 		"transbank-sdk": "~5.0.0",
-		"ua-parser-js": "~1.0.37",
+		"ua-parser-js": "~1.0.38",
 		"xss": "~1.0.15"
 	}
 }
