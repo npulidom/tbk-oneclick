@@ -85,6 +85,8 @@ async function init() {
 
 /**
  * Gracefull exit
+ * @param {string} signal - The signal
+ * @returns {undefined}
  */
 async function exitGracefully(signal) {
 
