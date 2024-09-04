@@ -1,5 +1,5 @@
 # ! base stage
-FROM node:18-alpine AS base
+FROM node:20-alpine AS base
 
 # allow "node" user to open port 80
 RUN apk add libcap && setcap 'cap_net_bind_service=+ep' /usr/local/bin/node
@@ -39,9 +39,8 @@ FROM base AS dev
 
 ENV NODE_ENV=development
 
-# install nodemon & deps
-RUN npm i -g nodemon && \
-	npm ci --production && npm cache clean --force
+# install deps
+RUN npm ci --production && npm cache clean --force
 
 # copy app
 COPY . .
@@ -50,4 +49,4 @@ COPY . .
 USER node
 
 # cmd
-CMD ["nodemon", "init.js"]
+CMD ["node", "--watch", "init.js"]

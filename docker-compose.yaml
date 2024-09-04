@@ -1,4 +1,4 @@
-version: '3.8'
+# docker compose
 services:
   # tbk-oneclick
   tbk-oneclick:
