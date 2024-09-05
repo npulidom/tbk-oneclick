@@ -138,7 +138,7 @@ async function finishInscription(req, res) {
 
 		const { hash = '' } = req.params
 		const { TBK_TOKEN = '' } = req.query
-
+		// validate params
 		if (!TBK_TOKEN) throw 'INVALID_TBK_TOKEN'
 
 		// decrypt inscription id
@@ -295,8 +295,8 @@ async function charge(req, res) {
 		// set TBK transaction (child buyOrder same as parent)
 		const details = [new TransactionDetail(amount, commerceCode, buyOrder, shares)]
 		// transbank API call
-		const mtrx     = new Oneclick.MallTransaction(Oneclick.options)
-		const response = await mtrx.authorize(
+		const $tbk = new Oneclick.MallTransaction(Oneclick.options)
+		const response = await $tbk.authorize(
 
 			inscription.userId.toString(),
 			inscription.token,
@@ -372,11 +372,11 @@ async function refund(req, res) {
 		if (!await mongo.count(COLLECTION.transactions, { buyOrder, userId: new ObjectId(userId) }))
 			throw 'BUY_ORDER_NOT_FOUND'
 
-		req.log.info(`Transbank (refund) -> refunding order, buyOrder=${buyOrder}`)
+		req.log.info(`Transbank (refund) -> refunding transaction, buyOrder=${buyOrder}`)
 
 		// transbank API call
-		const mtrx     = new Oneclick.MallTransaction(Oneclick.options)
-		const response = await mtrx.refund(buyOrder, commerceCode, buyOrder, amount)
+		const $tbk = new Oneclick.MallTransaction(Oneclick.options)
+		const response = await $tbk.refund(buyOrder, commerceCode, buyOrder, amount)
 
 		req.log.info(`Transbank (refund) -> response ok: ${JSON.stringify(response)}, buyOrder=${buyOrder}`)
 
