@@ -48,6 +48,9 @@ async function init() {
 			server.setCorsHeaders(res)
 			res.code(200)
 		}
+
+		// * empty body
+		if (/POST/.test(req.method) && !req.body) req.body = {}
 	})
 	// on-send event
 	app.addHook('onSend', async (req, res, payload) => {
