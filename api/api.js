@@ -14,7 +14,7 @@ import * as transbank from './transbank.js'
  */
 function setRoutes(app, basePath) {
 
-	// bearer auth required routes
+	// * bearer auth required routes
 	app.register(async (instance, opts) => {
 
 		// bearer auth plugin
@@ -23,8 +23,6 @@ function setRoutes(app, basePath) {
 		// routes
 		await instance.post(`${basePath}inscription/create`, (req, res) => transbank.createInscription(req, res))
 
-		await instance.post(`${basePath}inscription/finish/:hash`, (req, res) => transbank.finishInscription(req, res))
-
 		await instance.post(`${basePath}inscription/delete`, (req, res) => transbank.deleteInscription(req, res))
 
 		await instance.post(`${basePath}inscription/charge`, (req, res) => transbank.charge(req, res))
@@ -32,7 +30,7 @@ function setRoutes(app, basePath) {
 		await instance.post(`${basePath}inscription/refund`, (req, res) => transbank.refund(req, res))
 	})
 
-	// GET - no bearer auth required
+	// * no bearer auth required
 	app.get(`${basePath}inscription/finish/:hash`, (req, res) => transbank.finishInscription(req, res))
 
 	return app

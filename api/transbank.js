@@ -292,7 +292,7 @@ async function charge(req, res) {
 		// check if payment has not processed yet
 		if (await mongo.count(COLLECTION.transactions, { buyOrder })) throw 'BUY_ORDER_ALREADY_PROCESSED'
 
-		req.log.info(`Transbank (charge) -> authorizing trx, buyOrder=${buyOrder} inscriptionId=${inscription._id} ` +
+		req.log.info(`Transbank (charge) -> authorizing transaction, buyOrder=${buyOrder} inscriptionId=${inscription._id} ` +
 						`cc=${commerceCode} amount=${amount} shares=${shares}`)
 
 		// set TBK transaction (child buyOrder same as parent)
@@ -310,7 +310,7 @@ async function charge(req, res) {
 		if (!response.details?.length) throw `UNEXPECTED_TBK_RESPONSE`
 		if (response.details[0].response_code !== 0) throw `UNEXPECTED_TBK_RESPONSE_${response.details[0].response_code || 'NAN'}`
 
-		req.log.info(`Transbank (charge) -> trx authorized successfully! buyOrder=${buyOrder}`)
+		req.log.info(`Transbank (charge) -> transaction authorized successfully! buyOrder=${buyOrder}`)
 
 		// save pending inscription
 		const { insertedId } = await mongo.insertOne(COLLECTION.transactions, {
@@ -351,9 +351,9 @@ async function refund(req, res) {
 
 	let {
 
-		userId       = '', // ObjectId as string
 		commerceCode = '', // child commerce code
 		buyOrder     = '', // saved buyOrder
+		authCode     = '', // saved authCode
 		amount       = '', // amount to refund
 	} = req.body
 
@@ -362,18 +362,19 @@ async function refund(req, res) {
 		// sanitize inputs
 		buyOrder     = xss(buyOrder).trim()
 		commerceCode = xss(commerceCode).trim()
+		authCode     = xss(authCode).trim()
 		amount       = parseInt(amount) || 0
 
-		if (!ObjectId.isValid(userId)) throw 'INVALID_USER_ID'
 		if (!buyOrder) throw 'INVALID_BUY_ORDER'
+		if (!authCode) throw 'INVALID_AUTH_CODE'
 		if (!amount) throw 'INVALID_AMOUNT'
 
 		// default commerce code (integration)
 		if (!commerceCode) commerceCode = TEST_COMMERCE_CODE
 
 		// check if payment has not processed yet
-		if (!await mongo.count(COLLECTION.transactions, { buyOrder, userId: new ObjectId(userId) }))
-			throw 'BUY_ORDER_NOT_FOUND'
+		if (!await mongo.count(COLLECTION.transactions, { buyOrder, authCode }))
+			throw 'BUY_ORDER_WITH_AUTH_CODE_NOT_FOUND'
 
 		req.log.info(`Transbank (refund) -> refunding transaction, buyOrder=${buyOrder}`)
 
@@ -386,7 +387,7 @@ async function refund(req, res) {
 		if (!/REVERSED|NULLIFIED/.test(response.type))
 			throw `UNEXPECTED_TBK_RESPONSE_${response.type || 'NAN'}`
 
-		req.log.info(`Transbank (refund) -> order refunded successfully! buyOrder=${buyOrder}`)
+		req.log.info(`Transbank (refund) -> transaction refunded successfully! buyOrder=${buyOrder}`)
 
 		return { status: 'ok', response }
 	}
