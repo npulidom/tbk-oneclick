@@ -112,7 +112,7 @@ async function createInscription(req, res) {
 		// check response
 		if (!token || !url) throw 'UNEXPECTED_TBK_RESPONSE'
 
-		req.log.debug(`Transbank (createInscription) -> response received, token=${token}`)
+		req.log.info(`Transbank (createInscription) -> response received, token=${token.substring(0, 3)}****`)
 		req.log.info(`Transbank (createInscription) -> created 'pending' inscription, id=${insertedId.toString()}`)
 
 		return { status: 'ok', url, token }
