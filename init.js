@@ -49,8 +49,8 @@ async function init() {
 			res.code(200)
 		}
 
-		// * empty body
-		if (/POST/.test(req.method) && !req.body) req.body = {}
+		// * empty body fallback
+		if (req.method == 'POST' && !req.body) req.body = {}
 	})
 	// on-send event
 	app.addHook('onSend', async (req, res, payload) => {
