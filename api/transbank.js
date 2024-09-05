@@ -43,6 +43,9 @@ const TEST_COMMERCE_CODE = '597055555542'
  */
 async function setup() {
 
+	// logger
+	const { log } = server.app
+
 	// check redirect URLs
 	if (!process.env.BASE_URL) throw 'INVALID_BASE_URL'
 	if (!process.env.TBK_SUCCESS_URL) throw 'INVALID_TBK_SUCCESS_URL'
@@ -53,7 +56,7 @@ async function setup() {
 		return Oneclick.configureOneclickMallForTesting()
 
 	// production credentials
-	console.log(`Transbank (setup) -> production mode, code=${process.env.TBK_CODE} tbk-key=${process.env.TBK_KEY.substring(0, 3)}****`)
+	log.info(`Transbank (setup) -> production mode, code=${process.env.TBK_CODE} tbk-key=${process.env.TBK_KEY.substring(0, 3)}****`)
 
 	Oneclick.configureForProduction(process.env.TBK_CODE, process.env.TBK_KEY)
 }
@@ -107,8 +110,8 @@ async function createInscription(req, res) {
 		const finishUrl = server.getBaseUrl(`inscription/finish/${hash}`)
 
 		// transbank API call
-		const ins = new Oneclick.MallInscription(Oneclick.options)
-		const { token, url_webpay: url } = await ins.start(userId, email, finishUrl)
+		const $tbk = new Oneclick.MallInscription(Oneclick.options)
+		const { token, url_webpay: url } = await $tbk.start(userId, email, finishUrl)
 		// check response
 		if (!token || !url) throw 'UNEXPECTED_TBK_RESPONSE'
 
@@ -152,8 +155,8 @@ async function finishInscription(req, res) {
 		if (!inscription) throw 'PENDING_INSCRIPTION_NOT_FOUND'
 
 		// transbank API call
-		const ins = new Oneclick.MallInscription(Oneclick.options)
-		const response = await ins.finish(TBK_TOKEN)
+		const $tbk = new Oneclick.MallInscription(Oneclick.options)
+		const response = await $tbk.finish(TBK_TOKEN)
 
 		req.log.info(`Transbank (finishInscription) -> response code=${response.response_code || 'n/a'}`)
 
@@ -214,8 +217,8 @@ async function deleteInscription(req, res) {
 		req.log.info(`Transbank (deleteInscription) -> new request, token=${token.substring(0, 3)}**** userId=${userId}`)
 
 		// transbank API call
-		const ins = new Oneclick.MallInscription(Oneclick.options)
-		const response = await ins.delete(token, userId)
+		const $tbk = new Oneclick.MallInscription(Oneclick.options)
+		const response = await $tbk.delete(token, userId)
 
 		req.log.info(`Transbank (deleteInscription) -> response: ${JSON.stringify(response)}, inscription=${inscriptionId}`)
 
