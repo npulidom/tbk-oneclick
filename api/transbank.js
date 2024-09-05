@@ -211,7 +211,7 @@ async function deleteInscription(req, res) {
 		const { token } = inscription
 		if (!token) throw 'MISSING_INSCRIPTION_TOKEN_PROP'
 
-		req.log.info(`Transbank (deleteInscription) -> new request, token=****${token.substring(token.length - 6)} userId=${userId}`)
+		req.log.info(`Transbank (deleteInscription) -> new request, token=${token.substring(0, 3)}**** userId=${userId}`)
 
 		// transbank API call
 		const ins = new Oneclick.MallInscription(Oneclick.options)
