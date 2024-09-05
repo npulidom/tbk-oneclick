@@ -72,10 +72,10 @@ async function init() {
 	 */
 	app.setErrorHandler((error, req, res) => {
 
-		// log error
+		app.log.error(`Init (errorHandler) -> exception:`)
 		app.log.error(error)
 		// response
-		res.code(500).send({ error })
+		res.code(500).send({ status: 'error', error })
 	})
 
 	// start server
