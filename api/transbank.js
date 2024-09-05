@@ -59,7 +59,7 @@ async function setup() {
 }
 
 /**
- * Create Inscription
+ * Action - Create Inscription
  * @param {object} req - The request object
  * @param {object} res - The response object
  * @returns {undefined}
@@ -125,7 +125,7 @@ async function createInscription(req, res) {
 }
 
 /**
- * Finish Inscription
+ * Action - Finish Inscription
  * @param {object} req - The request object
  * @param {object} res - The response object
  * @returns {undefined}
@@ -187,7 +187,7 @@ async function finishInscription(req, res) {
 }
 
 /**
- * Delete Inscription
+ * Action - Delete Inscription
  * @param {object} req - The request object
  * @param {object} res - The response object
  * @returns {undefined}
@@ -243,7 +243,7 @@ async function deleteInscription(req, res) {
 }
 
 /**
- * Inscription Charge
+ * Action - Inscription Charge
  * @param {object} req - The request object
  * @param {object} res - The response object
  * @returns {undefined}
@@ -339,7 +339,7 @@ async function charge(req, res) {
 }
 
 /**
- * Refund transaction
+ * Action - Refund transaction
  * @param {object} req - The request object
  * @param {object} res - The response object
  * @returns {undefined}
