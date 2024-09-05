@@ -158,9 +158,9 @@ async function finishInscription(req, res) {
 		const $tbk = new Oneclick.MallInscription(Oneclick.options)
 		const response = await $tbk.finish(TBK_TOKEN)
 
-		req.log.info(`Transbank (finishInscription) -> response code=${response.response_code || 'n/a'}`)
+		req.log.info(`Transbank (finishInscription) -> response code=${response.response_code}`)
 
-		if (response.response_code !== 0) throw `UNEXPECTED_TBK_RESPONSE_${response.response_code || 'NAN'}`
+		if (response.response_code !== 0) throw `UNEXPECTED_TBK_RESPONSE:${response.response_code}`
 
 		const update = {
 
@@ -168,7 +168,7 @@ async function finishInscription(req, res) {
 			token     : response.tbk_user,
 			authCode  : response.authorization_code,
 			cardType  : response.card_type,
-			cardDigits: response.card_number.substring(response.card_number.length - 4) // last 4 digits
+			cardDigits: response.card_number // last 4 digits
 		}
 
 		// update inscription
@@ -308,7 +308,7 @@ async function charge(req, res) {
 		)
 
 		if (!response.details?.length) throw `UNEXPECTED_TBK_RESPONSE`
-		if (response.details[0].response_code !== 0) throw `UNEXPECTED_TBK_RESPONSE_${response.details[0].response_code || 'NAN'}`
+		if (response.details[0]?.response_code !== 0) throw `UNEXPECTED_TBK_RESPONSE:${response.details[0]?.response_code}`
 
 		req.log.info(`Transbank (charge) -> transaction authorized successfully! buyOrder=${buyOrder}`)
 
