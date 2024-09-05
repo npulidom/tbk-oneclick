@@ -97,9 +97,9 @@ async function createInscription(req, res) {
 			client   : {
 
 				...browser,
-				os: os.name || null,
+				os   : os.name || null,
 				uaRaw: req.headers['user-agent'],
-				ip: req.headers['x-forwarded-for'] || req.ip,
+				ip   : req.headers['x-forwarded-for'] || req.ip,
 			}
 		})
 
@@ -109,7 +109,7 @@ async function createInscription(req, res) {
 		// transbank API call
 		const ins = new Oneclick.MallInscription(Oneclick.options)
 		const { token, url_webpay: url } = await ins.start(userId, email, finishUrl)
-
+		// check response
 		if (!token || !url) throw 'UNEXPECTED_TBK_RESPONSE'
 
 		req.log.debug(`Transbank (createInscription) -> response received, token=${token}`)
