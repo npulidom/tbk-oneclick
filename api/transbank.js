@@ -307,8 +307,9 @@ async function charge(req, res) {
 			details
 		)
 
-		if (!response.details?.length) throw `UNEXPECTED_TBK_RESPONSE`
-		if (response.details[0]?.response_code !== 0) throw `UNEXPECTED_TBK_RESPONSE:${response.details[0]?.response_code}`
+		// check response
+		if (response.details?.[0]?.response_code !== 0)
+			throw `UNEXPECTED_TBK_RESPONSE:${response.details?.[0]?.response_code}`
 
 		req.log.info(`Transbank (charge) -> transaction authorized successfully! buyOrder=${buyOrder}`)
 
