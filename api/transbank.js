@@ -162,13 +162,15 @@ async function finishInscription(req, res) {
 
 		if (response.response_code !== 0) throw `UNEXPECTED_TBK_RESPONSE:${response.response_code}`
 
+		const cardNumber = response.card_number // last 4 digits (remove xx/** from card number)
+
 		const update = {
 
 			status    : 'success',
 			token     : response.tbk_user,
 			authCode  : response.authorization_code,
 			cardType  : response.card_type,
-			cardDigits: response.card_number // last 4 digits
+			cardDigits: cardNumber.substring(cardNumber.length - 4),
 		}
 
 		// update inscription
