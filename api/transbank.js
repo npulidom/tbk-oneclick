@@ -258,8 +258,8 @@ async function charge(req, res) {
 		// sanitize inputs
 		buyOrder     = xss(buyOrder).trim()
 		commerceCode = xss(commerceCode).trim()
-		amount       = parseInt(amount) || 0
-		shares       = parseInt(shares) || 1
+		amount       = Number.parseInt(amount) || 0
+		shares       = Number.parseInt(shares) || 1
 
 		if (!ObjectId.isValid(userId)) throw 'INVALID_USER_ID'
 		if (!buyOrder) throw 'INVALID_BUY_ORDER'
@@ -315,7 +315,7 @@ async function charge(req, res) {
 			responseCode : response.details[0].response_code,
 			paymentType  : response.details[0].payment_type_code,
 			status       : response.details[0].status,
-			shares       : parseInt(response.details[0].installments_number),
+			shares       : Number.parseInt(response.details[0].installments_number),
 			amount,
 			createdAt    : new Date(),
 		})
@@ -354,7 +354,7 @@ async function refund(req, res) {
 		commerceCode = xss(commerceCode).trim()
 		buyOrder     = xss(buyOrder).trim()
 		authCode     = xss(authCode).trim()
-		amount       = parseInt(amount) || 0
+		amount       = Number.parseInt(amount) || 0
 
 		if (!buyOrder) throw 'INVALID_BUY_ORDER'
 		if (!authCode) throw 'INVALID_AUTH_CODE'
