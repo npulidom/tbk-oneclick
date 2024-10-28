@@ -292,7 +292,7 @@ async function charge(req, res) {
 		if (!inscription.token) throw 'MISSING_INSCRIPTION_TOKEN_PROP'
 
 		// check if payment has not processed yet
-		if (await mongo.count(COLLECTION.transactions, { buyOrder })) throw 'BUY_ORDER_ALREADY_PROCESSED'
+		if (await mongo.count(COLLECTION.transactions, { buyOrder })) throw 'TRX_ALREADY_PROCESSED'
 
 		req.log.info(`Transbank (charge) -> authorizing transaction, buyOrder=${buyOrder} inscriptionId=${inscription._id} ` +
 						`cc=${commerceCode} amount=${amount} shares=${shares}`)
