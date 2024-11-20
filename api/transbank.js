@@ -168,7 +168,7 @@ async function finishInscription(req, res) {
 
 		req.log.info(`Transbank (finishInscription) -> inscription finished successfully, id=${inscriptionId}`)
 
-		res.redirect(`${process.env.TBK_SUCCESS_URL}?inscriptionId=${inscriptionId}`)
+		return res.redirect(`${process.env.TBK_SUCCESS_URL}?inscriptionId=${inscriptionId}`)
 	}
 	catch (e) {
 
@@ -177,7 +177,7 @@ async function finishInscription(req, res) {
 			await mongo.updateOne(COLLECTION.inscriptions, { _id: new ObjectId(inscriptionId) }, { $set: { status: 'failed' } })
 
 		req.log.error(`Transbank (finishInscription) -> exception: ${e.toString()}`)
-		res.redirect(`${process.env.TBK_FAILED_URL}?inscriptionId=${inscriptionId}`)
+		return res.redirect(`${process.env.TBK_FAILED_URL}?inscriptionId=${inscriptionId}`)
 	}
 }
 
