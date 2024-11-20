@@ -129,11 +129,13 @@ async function finishInscription(req, res) {
 
 		const { hash = '' } = req.params
 		const { TBK_TOKEN = '' } = req.query
-		// validate params
-		if (!TBK_TOKEN) throw 'INVALID_TBK_TOKEN'
 
 		// decrypt inscription id
-		inscriptionId = decrypt(hash)
+		inscriptionId = hash ? decrypt(hash) : null
+
+		// validate params
+		if (!TBK_TOKEN) throw 'INVALID_TBK_TOKEN'
+		if (!buyOrder) throw 'INVALID_BUY_ORDER'
 
 		req.log.debug(`Transbank (finishInscription) -> params, inscription=${inscriptionId} tbk-token=${TBK_TOKEN}`)
 
